@@ -2,6 +2,9 @@
 
 namespace BaoPham\DynamoDb;
 
+use JetBrains\PhpStorm\Pure;
+use ReturnTypeWillChange;
+
 /**
  * Class RawDynamoDbQuery
  *
@@ -21,7 +24,7 @@ class RawDynamoDbQuery implements \IteratorAggregate, \ArrayAccess, \Countable
      *
      * @var array
      */
-    public $query;
+    public array $query;
 
     public function __construct($op, $query)
     {
@@ -35,7 +38,7 @@ class RawDynamoDbQuery implements \IteratorAggregate, \ArrayAccess, \Countable
      *
      * @return $this
      */
-    public function finalize()
+    public function finalize(): static
     {
         $this->query = array_filter($this->query, function ($value) {
             return !empty($value) || is_bool($value) || is_numeric($value);
@@ -56,7 +59,7 @@ class RawDynamoDbQuery implements \IteratorAggregate, \ArrayAccess, \Countable
      * The return value will be casted to boolean if non-boolean was returned.
      * @since 5.0.0
      */
-    public function offsetExists($offset)
+    #[Pure] public function offsetExists(mixed $offset): bool
     {
         return isset($this->internal()[$offset]);
     }
@@ -70,7 +73,7 @@ class RawDynamoDbQuery implements \IteratorAggregate, \ArrayAccess, \Countable
      * @return mixed Can return all value types.
      * @since 5.0.0
      */
-    public function offsetGet($offset)
+    #[Pure] public function offsetGet(mixed $offset): mixed
     {
         return $this->internal()[$offset];
     }
@@ -87,7 +90,7 @@ class RawDynamoDbQuery implements \IteratorAggregate, \ArrayAccess, \Countable
      * @return void
      * @since 5.0.0
      */
-    public function offsetSet($offset, $value)
+    #[ReturnTypeWillChange] #[Pure] public function offsetSet(mixed $offset, mixed $value): void
     {
         $this->internal()[$offset] = $value;
     }
@@ -101,7 +104,7 @@ class RawDynamoDbQuery implements \IteratorAggregate, \ArrayAccess, \Countable
      * @return void
      * @since 5.0.0
      */
-    public function offsetUnset($offset)
+    #[ReturnTypeWillChange] public function offsetUnset(mixed $offset): void
     {
         unset($this->internal()[$offset]);
     }
@@ -113,7 +116,7 @@ class RawDynamoDbQuery implements \IteratorAggregate, \ArrayAccess, \Countable
      * <b>Traversable</b>
      * @since 5.0.0
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayObject($this->internal());
     }
@@ -127,7 +130,7 @@ class RawDynamoDbQuery implements \IteratorAggregate, \ArrayAccess, \Countable
      * The return value is cast to an integer.
      * @since 5.1.0
      */
-    public function count()
+    #[Pure] public function count(): int
     {
         return count($this->internal());
     }
@@ -139,7 +142,7 @@ class RawDynamoDbQuery implements \IteratorAggregate, \ArrayAccess, \Countable
      *
      * @return array
      */
-    private function internal()
+    private function internal(): array
     {
         return [$this->op, $this->query];
     }
